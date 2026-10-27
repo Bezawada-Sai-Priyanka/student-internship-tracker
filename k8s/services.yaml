@@ -10,4 +10,4 @@ spec:
     - name: http
       port: 5000
       targetPort: 5000
-      nodePort: 3080
+      nodePort: 30081
