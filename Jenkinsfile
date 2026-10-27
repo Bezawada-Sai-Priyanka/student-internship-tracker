@@ -38,12 +38,20 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    env.IMAGE_TAG = "${env.BUILD_NUMBER}"
-                    env.FULL_IMAGE = "${env.DOCKERHUB_USERNAME}/${env.IMAGE_NAME}:${env.IMAGE_TAG}"
-                }
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_PASSWORD'
+                    )
+                ]) {
+                    script {
+                        env.IMAGE_TAG = "${env.BUILD_NUMBER}"
+                        env.FULL_IMAGE = "${env.DOCKERHUB_USERNAME}/${env.IMAGE_NAME}:${env.IMAGE_TAG}"
+                    }
 
-                bat 'docker build -t %FULL_IMAGE% -t %DOCKERHUB_USERNAME%/%IMAGE_NAME%:latest .'
+                    bat 'docker build -t %FULL_IMAGE% -t %DOCKERHUB_USERNAME%/%IMAGE_NAME%:latest .'
+                }
             }
         }
 
@@ -52,8 +60,8 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'preezypanda0711',
-                        passwordVariable: 'Asdfghjkl'
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_PASSWORD'
                     )
                 ]) {
                     bat '''
