@@ -1,0 +1,52 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-tracker
+  labels:
+    app: student-tracker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student-tracker
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: student-tracker
+    spec:
+      containers:
+        - name: student-tracker
+          image: preezypanda0711/student-internship-tracker:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: student-tracker-secrets
+                  key: secret-key
+            - name: DATABASE_PATH
+              value: /data/internships.db
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

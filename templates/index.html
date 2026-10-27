@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Internship Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            margin: 0;
+            padding: 30px;
+            color: #253047;
+        }
+        main { max-width: 1050px; margin: auto; }
+        h1 { color: #214b91; }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .card, form, .table-wrap {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px #0000000c;
+        }
+        .card strong { display: block; font-size: 26px; margin-top: 8px; }
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        input, select, button {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccd4e0;
+            border-radius: 6px;
+        }
+        button {
+            background: #2458a6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 14px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e3e8f0;
+        }
+        .table-wrap { overflow-x: auto; }
+        .success { color: #147d45; }
+        .error { color: #b42318; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Student Internship Tracker</h1>
+    <p>Manage student applications, interviews, and internship offers.</p>
+
+    <section class="cards">
+        <div class="card">Total records<strong>{{ students|length }}</strong></div>
+        {% for status, count in counts.items() %}
+        <div class="card">{{ status }}<strong>{{ count }}</strong></div>
+        {% endfor %}
+    </section>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <p class="{{ category }}">{{ message }}</p>
+    {% endfor %}
+
+    <form action="{{ url_for('add_student') }}" method="post">
+        <h2>Add Internship Record</h2>
+        <div class="fields">
+            <input name="student_name" placeholder="Student name" required>
+            <input name="student_email" type="email" placeholder="Student email" required>
+            <input name="company" placeholder="Company name" required>
+            <input name="role" placeholder="Internship role" required>
+            <select name="status">
+                {% for status in statuses %}
+                <option value="{{ status }}">{{ status }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit">Add Internship</button>
+    </form>
+
+    <section class="table-wrap">
+        <h2>Internship Records</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th><th>Email</th><th>Company</th>
+                    <th>Role</th><th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.student_name }}</td>
+                    <td>{{ student.student_email }}</td>
+                    <td>{{ student.company }}</td>
+                    <td>{{ student.role }}</td>
+                    <td>{{ student.status }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No internship records yet. Add one above.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>
